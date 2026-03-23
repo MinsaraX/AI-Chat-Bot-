@@ -11,8 +11,6 @@ A modern browser-based chatbot UI that works with OpenRouter API key (or any sim
 - AI/user chat bubbles with typing animation
 - API key entry modal (initial prompt)
 - Password-protected API key management:
-  - Button next to theme toggle
-  - Password is `0000` (configurable in `script.js`)
   - Reveal/hide current API key
   - Save new API key to localStorage
 - Markdown-like bot message formatting:
@@ -28,7 +26,7 @@ A modern browser-based chatbot UI that works with OpenRouter API key (or any sim
 
 ## Getting Started
 
-### 1. Get Your OpenRouter API Key
+### 1.🚀Get Your OpenRouter API Key
 
 1. Visit [OpenRouter.io](https://openrouter.io)
 2. Sign up or log in to your account
@@ -36,14 +34,14 @@ A modern browser-based chatbot UI that works with OpenRouter API key (or any sim
 4. Create your API
 4. Copy your API Key
 
-### 2. Open the Application
+### 2.📁Open the Application
 
 1. Open `index.html` directly in your web browser
    - Double-click the file, or
    - Drag it into your browser, or
    - Right-click → Open with → Browser
 
-### 3. Setup
+### 3.🛠️Setup
 
 1. Click API key button.
 2. Enter the password(0000).
@@ -57,20 +55,6 @@ A modern browser-based chatbot UI that works with OpenRouter API key (or any sim
 - `index.html` — main interface, dialog modals, style, and layout
 - `script.js` — event logic, message rendering, API call handling
 - `README.md` — this file
-
-## 🛠️ Setup
-
-1. Clone repository:
-   ```bash
-   git clone https://github.com/<your-username>/ai-practiccal-3.git
-   cd ai-practiccal-3
-   ```
-
-2. Open `index.html` in browser (or use live server extension in VS Code)
-
-3. For first run, enter your OpenRouter API key in the modal.
-
-4. Use the `API Key` button in the header to change key (password: `0000`).
 
 ## 🧩 Usage
 
