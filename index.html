@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MinsaraX-Chatbot</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .typing-cursor::after {
+            content: '|';
+            animation: blink 1s infinite;
+        }
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+        .message-animation {
+            animation: slideIn 0.3s ease-out;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .thinking-dots {
+            display: inline-flex;
+            gap: 4px;
+        }
+        .thinking-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #38BDF8;
+            animation: bounce 1.4s infinite;
+        }
+        .thinking-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        .thinking-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        @keyframes bounce {
+            0%, 80%, 100% { opacity: 0.5; transform: translateY(0); }
+            40% { opacity: 1; transform: translateY(-10px); }
+        }
+        .hover-scale:hover {
+            transform: scale(1.05);
+            transition: transform 0.2s;
+        }
+
+        /* Modern Glass Morphism Effects */
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        }
+
+        .glass-dark {
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+        }
+
+        /* Neon Effects */
+        .neon-blue {
+            box-shadow: 0 0 5px #3b82f6, 0 0 10px #3b82f6, 0 0 15px #3b82f6, 0 0 20px #3b82f6;
+        }
+
+        .neon-purple {
+            box-shadow: 0 0 5px #8b5cf6, 0 0 10px #8b5cf6, 0 0 15px #8b5cf6, 0 0 20px #8b5cf6;
+        }
+
+        /* Modern Background */
+        .modern-bg {
+            background: #0F172A;
+            background-attachment: fixed;
+            position: relative;
+        }
+
+        .modern-bg::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
+            border-radius: 50%;
+            filter: blur(100px);
+            z-index: 0;
+        }
+
+        .modern-bg-dark {
+            background: #0F172A;
+            background-attachment: fixed;
+            position: relative;
+        }
+
+        .modern-bg-dark::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.15) 0%, transparent 70%);
+            border-radius: 50%;
+            filter: blur(100px);
+            z-index: 0;
+        }
+
+        /* Enhanced Message Bubbles */
+        .message-bubble-user {
+            background: rgba(59, 130, 246, 0.2);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 8px 32px 0 rgba(59, 130, 246, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1);
+            color: #F8FAFC;
+        }
+
+        .message-bubble-ai {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255, 255, 255, 0.05);
+            color: #F8FAFC;
+        }
+
+        .drag-zone {
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .drag-zone:hover {
+            border-color: rgba(56, 189, 248, 0.6);
+            background: rgba(56, 189, 248, 0.1);
+        }
+
+        .drag-over {
+            border-color: #38BDF8 !important;
+            background: rgba(56, 189, 248, 0.2) !important;
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.4);
+        }
+
+        .image-preview-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .image-preview-content {
+            max-width: 90vw;
+            max-height: 90vh;
+            position: relative;
+        }
+        .image-preview-content img {
+            max-width: 100%;
+            max-height: 100%;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Modern Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(30, 41, 59, 0.5);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(56, 189, 248, 0.3);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(56, 189, 248, 0.5);
+        }
+
+        /* ========== LIGHT MODE STYLES ========== */
+        html.light {
+            color-scheme: light;
+        }
+
+        html.light body {
+            background: linear-gradient(135deg, #F8FAFC 0%, #E2E8F0 100%);
+            background-attachment: fixed;
+            color: #1E293B;
+        }
+
+        html.light .modern-bg {
+            background: linear-gradient(135deg, #F8FAFC 0%, #E2E8F0 100%);
+            background-attachment: fixed;
+        }
+
+        html.light .modern-bg::before {
+            background: radial-gradient(circle, rgba(14, 165, 233, 0.08) 0%, transparent 70%);
+        }
+
+        /* Light Mode Glass */
+        html.light .glass {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1.5px solid rgba(14, 165, 233, 0.3);
+            box-shadow: 0 4px 20px rgba(15, 23, 42, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            color: #1E293B;
+        }
+
+        /* Light Mode Text */
+        html.light {
+            --text-primary: #1E293B;
+            --text-secondary: #64748B;
+            --accent: #0EA5E9;
+        }
+
+        html.light h1,
+        html.light h2,
+        html.light h3 {
+            color: #1E293B;
+        }
+
+        html.light .text-white {
+            color: #1E293B;
+        }
+
+        html.light .text-\[\#F8FAFC\] {
+            color: #1E293B;
+        }
+
+        html.light .text-\[\#94A3B8\] {
+            color: #64748B;
+        }
+
+        /* Light Mode Message Bubbles */
+        html.light .message-bubble-user {
+            background: linear-gradient(135deg, rgba(14, 165, 233, 0.2) 0%, rgba(14, 165, 233, 0.1) 100%);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1.5px solid rgba(14, 165, 233, 0.4);
+            box-shadow: 0 4px 20px rgba(14, 165, 233, 0.12);
+            color: #1E293B;
+        }
+
+        html.light .message-bubble-ai {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.5) 100%);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1.5px solid rgba(226, 232, 240, 0.8);
+            box-shadow: 0 4px 20px rgba(15, 23, 42, 0.06);
+            color: #1E293B;
+        }
+
+        /* Light Mode Drag Zone */
+        html.light .drag-zone {
+            border: 2.5px dashed rgba(14, 165, 233, 0.6);
+            background: linear-gradient(135deg, rgba(14, 165, 233, 0.08) 0%, rgba(14, 165, 233, 0.04) 100%);
+            color: #1E293B;
+            box-shadow: inset 0 2px 8px rgba(14, 165, 233, 0.05);
+        }
+
+        html.light .drag-zone:hover {
+            border-color: rgba(14, 165, 233, 0.9);
+            background: linear-gradient(135deg, rgba(14, 165, 233, 0.15) 0%, rgba(14, 165, 233, 0.08) 100%);
+            box-shadow: inset 0 2px 8px rgba(14, 165, 233, 0.1), 0 4px 12px rgba(14, 165, 233, 0.15);
+        }
+
+        html.light .drag-over {
+            border-color: #0EA5E9 !important;
+            background: linear-gradient(135deg, rgba(14, 165, 233, 0.2) 0%, rgba(14, 165, 233, 0.12) 100%) !important;
+            box-shadow: 0 8px 24px rgba(14, 165, 233, 0.25) !important;
+        }
+
+        /* Light Mode Buttons */
+        html.light .neon-blue {
+            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.15);
+        }
+
+        html.light button {
+            color: #1E293B;
+            transition: all 0.3s ease;
+        }
+
+        html.light .glass:hover {
+            background: rgba(255, 255, 255, 0.7);
+            border-color: rgba(14, 165, 233, 0.5);
+        }
+
+        html.light #send-button {
+            border: 1.5px solid rgba(14, 165, 233, 0.4);
+            color: #0EA5E9;
+            font-weight: 600;
+        }
+
+        html.light #send-button:hover {
+            background: rgba(14, 165, 233, 0.15);
+            border-color: rgba(14, 165, 233, 0.6);
+        }
+
+        html.light #stop-button {
+            border: 1.5px solid rgba(239, 68, 68, 0.4);
+            color: #dc2626;
+        }
+
+        html.light #stop-button:hover {
+            background: rgba(239, 68, 68, 0.15);
+            border-color: rgba(239, 68, 68, 0.6);
+        }
+
+        html.light #new-chat-btn {
+            border: 1.5px solid rgba(14, 165, 233, 0.4);
+            color: #0EA5E9;
+        }
+
+        html.light #new-chat-btn:hover {
+            background: rgba(14, 165, 233, 0.15);
+            border-color: rgba(14, 165, 233, 0.6);
+        }
+
+        html.light #theme-toggle {
+            color: #0EA5E9;
+        }
+
+        html.light #theme-toggle:hover {
+            background: rgba(14, 165, 233, 0.15);
+        }
+
+        /* Light Mode Input */
+        html.light #message-input,
+        html.light #api-key-input {
+            color: #1E293B;
+            background: rgba(255, 255, 255, 0.6);
+            border: 1.5px solid rgba(14, 165, 233, 0.25);
+        }
+
+        html.light #message-input:focus,
+        html.light #api-key-input:focus {
+            border-color: rgba(14, 165, 233, 0.6);
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+        }
+
+        html.light #message-input::placeholder,
+        html.light #api-key-input::placeholder {
+            color: #94A3B8;
+        }
+
+        /* Light Mode Select */
+        html.light #model-select {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.65) 0%, rgba(255, 255, 255, 0.55) 100%);
+            color: #1E293B;
+            border: 1.5px solid rgba(14, 165, 233, 0.3);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        html.light #model-select:focus {
+            border-color: rgba(14, 165, 233, 0.6);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05), 0 0 0 3px rgba(14, 165, 233, 0.1);
+        }
+
+        html.light #model-select option {
+            background: #F8FAFC;
+            color: #1E293B;
+        }
+
+        /* Light Mode Scrollbar */
+        html.light ::-webkit-scrollbar-track {
+            background: rgba(226, 232, 240, 0.8);
+        }
+
+        html.light ::-webkit-scrollbar-thumb {
+            background: rgba(14, 165, 233, 0.3);
+        }
+
+        html.light ::-webkit-scrollbar-thumb:hover {
+            background: rgba(14, 165, 233, 0.5);
+        }
+
+        /* Light Mode Icons */
+        html.light .fa-cloud-upload-alt {
+            color: #0EA5E9;
+        }
+
+        html.light .fas {
+            color: #0EA5E9;
+        }
+
+        /* Light Mode Modal */
+        html.light #api-key-modal {
+            background: rgba(241, 245, 249, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        html.light #api-key-modal .glass {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.7) 100%);
+            border: 1.5px solid rgba(14, 165, 233, 0.4);
+            box-shadow: 0 20px 60px rgba(15, 23, 42, 0.12);
+        }
+
+        /* Light Mode Header */
+        html.light header {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.65) 0%, rgba(255, 255, 255, 0.55) 100%);
+            border: 1px solid rgba(14, 165, 233, 0.2);
+            box-shadow: 0 2px 12px rgba(15, 23, 42, 0.08);
+        }
+
+        html.light header h1 {
+            color: #1E293B;
+        }
+
+        /* Light Mode Thinking Dots */
+        html.light .thinking-dot {
+            background: #0EA5E9;
+        }
+
+        /* Light Mode Remove Button */
+        html.light #remove-image {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        html.light #remove-image:hover {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: rgba(239, 68, 68, 0.5);
+        }
+
+        /* Light Mode Image Preview */
+        html.light #image-preview {
+            border: 1px solid rgba(14, 165, 233, 0.2);
+            border-radius: 12px;
+        }
+
+        /* Light Mode Text Strong Contrast */
+        html.light .text-lg {
+            color: #1E293B;
+        }
+
+        html.light .text-sm {
+            color: #64748B;
+        }
+
+        /* Message Action Buttons */
+        .message-bubble-ai .mt-2 {
+            opacity: 0.6;
+        }
+
+        .message-bubble-ai:hover .mt-2 {
+            opacity: 1 !important;
+        }
+
+        /* Light Mode Action Buttons */
+        html.light .message-bubble-ai button {
+            color: #64748B;
+        }
+
+        html.light .message-bubble-ai button:hover {
+            color: #1E293B;
+        }
+
+        html.light .message-bubble-ai button:hover.text-green-400 {
+            color: #16a34a !important;
+        }
+
+        html.light .message-bubble-ai button:hover.text-red-400 {
+            color: #dc2626 !important;
+        }
+    </style>
+</head>
+<body class="modern-bg h-screen flex flex-col text-white overflow-hidden">
+    <!-- Header with New Chat Button -->
+    <header class="glass p-4 flex justify-between items-center neon-blue relative z-10">
+        <div class="flex items-center space-x-4">
+            <h1 class="text-2xl font-bold text-[#F8FAFC]">
+                MinsaraX-Chatbot
+            </h1>
+            <select id="model-select" class="glass p-2 rounded-lg bg-black text-white focus:outline-none focus:ring-2 focus:ring-[#38BDF8] transition text-sm">
+                <option value="stepfun/step-3.5-flash:free">StepFun 3.5 Flash (Free-only chat)</option>
+                <option value="nvidia/nemotron-3-super-120b-a12b:free">NVIDIA Nemotron 3 Super (Free-only chat)</option>
+                <option value="google/gemma-3-12b-it:free">Google Gemma 3 12B (Free-image generation)</option>
+            </select>
+        </div>
+        <div class="flex items-center space-x-4">
+            <button id="new-chat-btn" class="glass px-4 py-2 rounded-lg hover-scale transition text-[#F8FAFC] border border-[#38BDF8] hover:border-[#A78BFA]">
+                <i class="fas fa-plus mr-2"></i>New Chat
+            </button>
+            <button id="change-api-key-btn" class="glass px-4 py-2 rounded-lg hover-scale transition text-[#F8FAFC] border border-[#38BDF8] hover:border-[#A78BFA]" title="Change API Key">
+                <i class="fas fa-key mr-2"></i>API Key
+            </button>
+            <button id="theme-toggle" class="glass p-2 rounded-lg hover-scale transition text-[#F8FAFC]">
+                <i class="fas fa-moon"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Chat Area -->
+    <div class="flex-1 flex flex-col min-h-0">
+        <div id="api-key-modal" class="fixed inset-0 glass flex items-center justify-center z-50">
+            <div class="glass p-8 rounded-2xl shadow-2xl w-96 neon-blue">
+                <h2 class="text-2xl font-bold mb-6 text-center text-[#F8FAFC]">
+                    <i class="fas fa-key mr-2"></i>Enter OpenRouter API Key
+                </h2>
+                <input type="password" id="api-key-input" class="w-full p-3 glass rounded-lg mb-4 text-[#F8FAFC] placeholder-[#94A3B8] focus:outline-none focus:ring-2 focus:ring-[#38BDF8] transition" placeholder="Your API Key">
+                <button id="save-api-key" class="w-full glass px-6 py-3 rounded-lg hover-scale transition text-[#F8FAFC] border border-[#38BDF8] hover:border-[#A78BFA] font-semibold">
+                    <i class="fas fa-save mr-2"></i>Save API Key
+                </button>
+            </div>
+        </div>
+
+        <!-- Password Verification Modal -->
+        <div id="password-modal" class="fixed inset-0 glass flex items-center justify-center z-50 hidden">
+            <div class="glass p-8 rounded-2xl shadow-2xl w-96 neon-blue">
+                <h2 class="text-2xl font-bold mb-2 text-center text-[#F8FAFC]">
+                    <i class="fas fa-lock mr-2"></i>Verify Password
+                </h2>
+                <p class="text-center text-[#94A3B8] mb-6 text-sm">Enter your password to access API key settings</p>
+                <input type="password" id="password-input" class="w-full p-3 glass rounded-lg mb-4 text-[#F8FAFC] placeholder-[#94A3B8] focus:outline-none focus:ring-2 focus:ring-[#38BDF8] transition" placeholder="Enter password">
+                <div class="flex gap-3">
+                    <button id="verify-password-btn" class="flex-1 glass px-6 py-3 rounded-lg hover-scale transition text-[#F8FAFC] border border-[#38BDF8] hover:border-[#A78BFA] font-semibold">
+                        <i class="fas fa-check mr-2"></i>Verify
+                    </button>
+                    <button id="cancel-password-btn" class="flex-1 glass px-6 py-3 rounded-lg hover-scale transition text-[#F8FAFC] border border-red-500 hover:border-red-400 font-semibold">
+                        <i class="fas fa-times mr-2"></i>Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Change API Key Modal -->
+        <div id="change-api-key-modal" class="fixed inset-0 glass flex items-center justify-center z-50 hidden">
+            <div class="glass p-8 rounded-2xl shadow-2xl w-96 neon-blue">
+                <h2 class="text-2xl font-bold mb-6 text-center text-[#F8FAFC]">
+                    <i class="fas fa-key mr-2"></i>Manage API Key
+                </h2>
+                <div class="mb-6">
+                    <label class="block text-[#94A3B8] text-sm mb-2">Current API Key</label>
+                    <div class="glass p-3 rounded-lg flex items-center justify-between">
+                        <span id="current-api-key" class="text-[#F8FAFC] font-mono text-sm break-all flex-1">••••••••••••••••</span>
+                        <button id="toggle-api-key-btn" class="ml-2 text-[#38BDF8] hover:text-[#0EA5E9] transition" title="Show/Hide">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="mb-6">
+                    <label class="block text-[#94A3B8] text-sm mb-2">New API Key (optional)</label>
+                    <input type="password" id="new-api-key-input" class="w-full p-3 glass rounded-lg text-[#F8FAFC] placeholder-[#94A3B8] focus:outline-none focus:ring-2 focus:ring-[#38BDF8] transition" placeholder="Leave empty to keep current">
+                </div>
+                <div class="flex gap-3">
+                    <button id="save-new-api-key-btn" class="flex-1 glass px-6 py-3 rounded-lg hover-scale transition text-[#F8FAFC] border border-[#38BDF8] hover:border-[#A78BFA] font-semibold">
+                        <i class="fas fa-save mr-2"></i>Save
+                    </button>
+                    <button id="close-change-api-key-btn" class="flex-1 glass px-6 py-3 rounded-lg hover-scale transition text-[#F8FAFC] border border-red-500 hover:border-red-400 font-semibold">
+                        <i class="fas fa-times mr-2"></i>Close
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Messages Area (Only This Scrolls) -->
+        <div id="chat-container" class="flex-1 overflow-y-auto p-4 space-y-6 mx-8 lg:mx-32 xl:mx-40 w-auto min-h-0">
+            <!-- Messages will be appended here -->
+        </div>
+
+        <!-- Drag Zone and Image Preview (Fixed at Bottom) -->
+        <div class="mx-8 lg:mx-32 xl:mx-40 mb-4 flex-shrink-0">
+            <div id="drag-zone" class="drag-zone p-6 rounded-2xl text-center cursor-pointer mb-4">
+                <i class="fas fa-cloud-upload-alt text-3xl mb-2 text-[#38BDF8]"></i>
+                <p class="text-lg text-[#F8FAFC]">Drag & drop an image here or click to upload</p>
+                <p class="text-sm text-[#94A3B8] mt-1">Supports JPG, PNG, GIF, WebP</p>
+            </div>
+
+            <div id="image-preview" class="hidden mb-4">
+                <div class="glass p-4 rounded-2xl flex items-center space-x-4">
+                    <div class="relative">
+                        <img id="preview-img" class="w-24 h-24 object-cover rounded-xl border-2 border-[#38BDF8] cursor-pointer hover-scale" onclick="openImagePreview()">
+                        <button id="remove-image" class="absolute -top-3 -right-3 glass w-8 h-8 rounded-full flex items-center justify-center text-red-400 hover:text-red-300 transition">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-[#F8FAFC] font-semibold mb-1">Image ready to send</p>
+                        <p class="text-[#94A3B8] text-sm">Click image to preview • Click × to remove</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Input Area (Fixed at Bottom) -->
+        <div class="glass p-4 mx-8 lg:mx-32 xl:mx-40 mb-4 rounded-2xl flex-shrink-0">
+            <div class="flex items-center">
+                <input type="text" id="message-input" class="flex-1 glass p-4 rounded-l-xl text-[#F8FAFC] placeholder-[#94A3B8] focus:outline-none focus:ring-2 focus:ring-[#38BDF8] transition" placeholder="Type your message...">
+                <input type="file" id="image-input" accept="image/*" class="hidden">
+                <button id="send-button" class="glass px-6 py-4 rounded-r-xl hover-scale transition text-[#F8FAFC] border border-[#38BDF8] hover:border-[#A78BFA] font-semibold">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+                <button id="stop-button" class="glass px-6 py-4 rounded-r-xl hover-scale transition text-[#F8FAFC] border border-red-500 hover:border-red-400 font-semibold hidden">
+                    <i class="fas fa-stop"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Image Preview Modal -->
+    <div id="image-preview-modal" class="image-preview-modal hidden">
+        <div class="image-preview-content">
+            <img id="modal-preview-img" src="" alt="Image Preview">
+            <button id="close-modal" class="absolute top-4 right-4 bg-black bg-opacity-50 hover:bg-opacity-70 text-white rounded-full w-10 h-10 flex items-center justify-center transition">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

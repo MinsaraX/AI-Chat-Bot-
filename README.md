@@ -1,1 +1,85 @@
-# AI-Chat-Bot-
+# MinsaraX-Chatbot
+
+A modern browser-based chatbot UI that works with OpenRouter API key (or any similar chat completion engine).
+
+## 🚀 Features
+
+- Light/dark theme toggle (with persistence)
+- New chat button
+- Drag-and-drop image upload and inline image send support
+- Pause/stop streaming response support
+- AI/user chat bubbles with typing animation
+- API key entry modal (initial prompt)
+- Password-protected API key management:
+  - Button next to theme toggle
+  - Password is `0000` (configurable in `script.js`)
+  - Reveal/hide current API key
+  - Save new API key to localStorage
+- Markdown-like bot message formatting:
+  1. `**bold**` text support
+  2. `---` and `###` heading/topic support
+  3. Bullet/numbered list formatting for pointwise response
+
+## 📁 Project structure
+
+- `index.html` — main interface, dialog modals, style, and layout
+- `script.js` — event logic, message rendering, API call handling
+- `README.md` — this file
+
+## 🛠️ Setup
+
+1. Clone repository:
+   ```bash
+   git clone https://github.com/<your-username>/ai-practiccal-3.git
+   cd ai-practiccal-3
+   ```
+
+2. Open `index.html` in browser (or use live server extension in VS Code)
+
+3. For first run, enter your OpenRouter API key in the modal.
+
+4. Use the `API Key` button in the header to change key (password: `0000`).
+
+## 🧩 Usage
+
+1. Type your prompt in the input box and click send.
+2. Optionally upload an image via drag-and-drop.
+3. Click the moon/sun icon to switch themes.
+4. New chat resets conversation.
+
+## 🔒 Password-protected API key change flow
+
+- Click `API Key` button.
+- Enter password `0000`.
+- View current API key or type a new one.
+- Save to persist in localStorage.
+
+## 📝 Bot formatting
+
+- `**text**` => **text**
+- `---` + `###` lines => section headers
+- `- item` or `* item` => bullet list
+- `1. item` => numbered list
+
+## ✨ Customization
+
+- Change default password in `script.js`:
+  - `const CORRECT_PASSWORD = '0000';`
+
+- Change API endpoint or model name in `sendMessage()`.
+
+## 📌 Notes
+
+- All key storage is in browser localStorage (not secure for production).
+- For production you'll need backend API key management and secure auth.
+
+## 🤝 Contributing
+
+1. Fork the repo
+2. Create a branch `feature/your-feature`
+3. Commit changes
+4. Open a PR
+
+## 📄 License
+
+MIT
