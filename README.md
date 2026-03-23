@@ -20,6 +20,38 @@ A modern browser-based chatbot UI that works with OpenRouter API key (or any sim
   2. `---` and `###` heading/topic support
   3. Bullet/numbered list formatting for pointwise response
 
+## Requirements
+
+- Modern web browser (Chrome, Firefox, Safari, Edge)
+- OpenRouter API Key (https://openrouter.io)
+- Internet connection
+
+## Getting Started
+
+### 1. Get Your OpenRouter API Key
+
+1. Visit [OpenRouter.io](https://openrouter.io)
+2. Sign up or log in to your account
+3. Go to your Dashboard
+4. Create your API
+4. Copy your API Key
+
+### 2. Open the Application
+
+1. Open `index.html` directly in your web browser
+   - Double-click the file, or
+   - Drag it into your browser, or
+   - Right-click → Open with → Browser
+
+### 3. Setup
+
+1. Click API key button.
+2. Enter the password(0000).
+3. Paste your OpenRouter API Key in the `**New API Key (optional)**` field
+4. Click **💾 Save** button
+5. Your API key will be saved to browser localStorage.
+6. Now you can use the AI chatbot.
+
 ## 📁 Project structure
 
 - `index.html` — main interface, dialog modals, style, and layout
